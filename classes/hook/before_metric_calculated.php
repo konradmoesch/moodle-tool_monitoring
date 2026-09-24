@@ -27,7 +27,6 @@ use core\hook\described_hook;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class before_metric_calculated implements described_hook {
-    #[\Override]
     public function __construct(
         /** @var string qualified name of the metric to be calculated */
         public readonly string $qualifiedname,

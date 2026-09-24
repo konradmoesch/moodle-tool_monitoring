@@ -28,7 +28,6 @@ use tool_monitoring\metric_value;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class after_metric_calculated implements described_hook {
-    #[\Override]
     public function __construct(
         /** @var string qualified name of the metric that has been calculated */
         public readonly string $qualifiedname,
