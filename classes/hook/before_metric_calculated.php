@@ -26,10 +26,15 @@ use core\hook\described_hook;
  * @copyright 2026 Konrad Moesch <konrad.moesch@uni-luebeck.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class before_metric_calculated implements described_hook {
+final readonly class before_metric_calculated implements described_hook {
+    /**
+     * The before_metric_calculated hook contains the qualified name of the metric it is attached to
+     *
+     * @param string $qualifiedname
+     */
     public function __construct(
         /** @var string qualified name of the metric to be calculated */
-        public readonly string $qualifiedname,
+        public string $qualifiedname,
     ) {
     }
     #[\Override]
