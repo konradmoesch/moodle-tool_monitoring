@@ -50,7 +50,9 @@ final readonly class overview implements renderable, templatable {
         /** @var iterable<string, registered_metric> Metrics for which to render the overview, indexed by qualified name. */
         private iterable $metrics,
         /** @var array<string, metric_tag> Tags used to filter the metrics by, indexed by normalized tag name. */
-        private array $tags
+        private array $tags,
+        /** @var string property to sort the list by. */
+        private string $sort
     ) {}
 
     /**
@@ -106,6 +108,7 @@ final readonly class overview implements renderable, templatable {
                 ];
             }
         }
+        $data['sort'] = $this->sort;
         return $data;
     }
 

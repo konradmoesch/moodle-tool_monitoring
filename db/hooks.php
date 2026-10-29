@@ -30,6 +30,8 @@
  */
 
 use core\hook\di_configuration;
+use tool_monitoring\hook\after_metric_calculated;
+use tool_monitoring\hook\before_metric_calculated;
 use tool_monitoring\hook\metric_collection;
 use tool_monitoring\local\metrics;
 use tool_monitoring\local\metrics_manager;
@@ -41,7 +43,7 @@ $callbacks = [
     ['hook' => di_configuration::class, 'callback' => [metrics_manager::class, 'configure_dependency_injection']],
     ['hook' => metric_collection::class, 'callback' => [metrics\courses::class, 'collect']],
     ['hook' => metric_collection::class, 'callback' => [metrics\overdue_tasks::class, 'collect']],
-    ['hook' => metric_collection::class, 'callback' => [metrics\quiz_attempts_in_progress::class, 'collect']],
-    ['hook' => metric_collection::class, 'callback' => [metrics\user_accounts::class, 'collect']],
-    ['hook' => metric_collection::class, 'callback' => [metrics\users_online::class, 'collect']],
+    ['hook' => metric_collection::class, 'callback' => [metrics\quiz_attempts_in_progress::class, 'collect'], 'priority' => 1],
+    ['hook' => metric_collection::class, 'callback' => [metrics\user_accounts::class, 'collect'], 'priority' => 500],
+    ['hook' => metric_collection::class, 'callback' => [metrics\users_online::class, 'collect'], 'priority' => 1000],
 ];
