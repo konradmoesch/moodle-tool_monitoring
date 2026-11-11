@@ -37,7 +37,7 @@ use tool_monitoring\registered_metric;
  *             Melanie Treitinger <melanie.treitinger@ruhr-uni-bochum.de>
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final readonly class overview implements renderable, templatable {
+final class overview implements renderable, templatable {
     /**
      * Constructor without additional logic.
      *
@@ -51,7 +51,7 @@ final readonly class overview implements renderable, templatable {
         private iterable $metrics,
         /** @var array<string, metric_tag> Tags used to filter the metrics by, indexed by normalized tag name. */
         private array $tags,
-        /** @var string property to sort the list by. */
+        /** @var string Properties to sort the list by. */
         private string $sort
     ) {}
 
@@ -66,6 +66,31 @@ final readonly class overview implements renderable, templatable {
     public function export_for_template(renderer_base $output): array {
         $tagsenabled = managed_metric_tag::is_enabled();
         $lines = [];
+        $sortings_raw = explode(',', $this->sort);
+
+        if (!empty($sortings_raw)) {
+            foreach ($sortings_raw as $sort) {
+                $sort_details = explode('_', $sort);
+                if (count($sort_details) == 2) {
+                    $sort_category = $sort_details[0];
+                    $sort_direction = $sort_details[1];
+                    print("sorting by " . $sort_category . "(" .$sort_direction.")\n");
+                    switch ($sort_category) {
+                        case "component":
+                            usort($this->metrics, "sort_by_component");
+                            break;
+                        case "name":
+                            usort($this->metrics, "sort_by_name");
+                            break;
+                    }
+                    if ($sort_direction == "DESC") {
+                        print("reversing sort");
+                        $this->metrics = array_reverse($this->metrics);
+                    }
+                }
+            }
+        }
+
         foreach ($this->metrics as $qualifiedname => $metric) {
             $configurl = new moodle_url('/admin/tool/monitoring/configure.php', ['metric' => $qualifiedname]);
             $line = [
@@ -108,8 +133,61 @@ final readonly class overview implements renderable, templatable {
                 ];
             }
         }
-        $data['sort'] = $this->sort;
+        $data['sort_debug'] = $this->sort;
+        $data['has_sort'] = !empty($sortings_raw);
+        foreach ($sortings_raw as $sort) {
+            $sort_details = explode('_', $sort);
+            if (count($sort_details) == 2) {
+                $sort_category = $sort_details[0];
+                $sort_direction = strtoupper($sort_details[1]);
+                $data['sort'][] = [
+                        'category' => $sort_category,
+                        'direction' => $sort_direction,
+                ];
+                switch ($sort_category) {
+                    case "component":
+                        switch ($sort_direction) {
+                            case "DESC":
+                                $data['sort_component_desc'] = true;
+                                break;
+                            case "ASC":
+                            default:
+                                $data['sort_component_asc'] = true;
+                                break;
+                        }
+                        break;
+                    case "name":
+                        switch ($sort_direction) {
+                            case "DESC":
+                                $data['sort_name_desc'] = true;
+                                break;
+                            case "ASC":
+                            default:
+                                $data['sort_name_asc'] = true;
+                                break;
+                        }
+                        break;
+                }
+            }
+        }
+        $data['default_sorting_url'] = $this->current_tag_url();
         return $data;
+    }
+
+    /**
+     * Generates a URL to the current overview with the current filter and default sorting.
+     *
+     * @return moodle_url URL with the `tag` query parameter listing the current {@see self::$tags}.
+     * @throws moodle_exception
+     */
+    private function current_tag_url(): moodle_url {
+        $tags = $this->tags;
+        if (empty($tags)) {
+            return new moodle_url('/admin/tool/monitoring/');
+
+        } else {
+            return new moodle_url('/admin/tool/monitoring/', ['tag' => implode(',', array_keys($tags))]);
+        }
     }
 
     /**
