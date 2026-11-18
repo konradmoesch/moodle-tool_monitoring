@@ -216,11 +216,11 @@ final class overview implements renderable, templatable {
     private function remove_tag_url(metric_tag $tag): moodle_url {
         $tags = $this->tags;
         unset($tags[$tag->name]);
-        $params = [];
+        $tagparam = "";
         if (!empty($tags)) {
-            $params['tag'] = implode(',', array_keys($tags));
+            $tagparam = implode(',', array_keys($tags));
         }
-        return new moodle_url('/admin/tool/monitoring/', $params);
+        return new moodle_url($this->currenturl, ['tag' => $tagparam]);
     }
 
     private function sort_url(string $sortstring): moodle_url {
