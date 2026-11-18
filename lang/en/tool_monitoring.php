@@ -86,7 +86,6 @@ $string['settings:metrics_overview'] = 'Overview of Available Metrics';
 $string['settings:metrics_overview_show_all'] = 'Show all metrics';
 $string['settings:metrics_overview_remove_sort'] = 'Restore original sorting';
 $string['settings:name'] = 'Name';
-$string['settings:sorting_by'] = 'Sorting by: ';
 $string['settings:tag_filter'] = 'Filter:';
 $string['settings:type'] = 'Type';
 
