@@ -64,7 +64,6 @@
 }}
 
 <h2>
-    {{current_url}}
     {{#str}} settings:metrics_overview, tool_monitoring {{/str}}
 </h2>
 {{#has_sort}}
@@ -89,24 +88,18 @@
   <thead>
     <tr>
       <th scope="col">
+          <a href="{{url_sort_component}}">{{#str}} settings:component, tool_monitoring {{/str}}</a>
           {{#sort_component_asc}}
-              <a href="{{url_sort_component_desc}}">{{#str}} settings:component, tool_monitoring {{/str}}</a>
               <i class="icon fa fa-arrow-up-short-wide fa-fw " aria-hidden="true" title="Aufsteigend"></i>
-          {{/sort_component_asc}}
-          {{^sort_component_asc}}
-              <a href="{{url_sort_component_asc}}">{{#str}} settings:component, tool_monitoring {{/str}}</a>
           {{/sort_component_asc}}
           {{#sort_component_desc}}
               <i class="icon fa fa-arrow-down-short-wide fa-fw " aria-hidden="true" title="Absteigend"></i>
           {{/sort_component_desc}}
       </th>
       <th scope="col">
+          <a href="{{url_sort_name}}">{{#str}} settings:name, tool_monitoring {{/str}}</a>
           {{#sort_name_asc}}
-              <a href="{{url_sort_name_desc}}">{{#str}} settings:name, tool_monitoring {{/str}}</a>
               <i class="icon fa fa-arrow-up-short-wide fa-fw " aria-hidden="true" title="Aufsteigend"></i>
-          {{/sort_name_asc}}
-          {{^sort_name_asc}}
-              <a href="{{url_sort_name_asc}}">{{#str}} settings:name, tool_monitoring {{/str}}</a>
           {{/sort_name_asc}}
           {{#sort_name_desc}}
               <i class="icon fa fa-arrow-down-short-wide fa-fw " aria-hidden="true" title="Absteigend"></i>

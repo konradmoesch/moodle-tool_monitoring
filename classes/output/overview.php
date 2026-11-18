@@ -68,26 +68,22 @@ final class overview implements renderable, templatable {
     public function export_for_template(renderer_base $output): array {
         $tagsenabled = managed_metric_tag::is_enabled();
         $lines = [];
-        $sortings_raw = explode(',', $this->sort);
+        $sort_array = sorting_helper::parse_sort_string($this->sort);
 
-        if (!empty($sortings_raw)) {
-            foreach ($sortings_raw as $sort) {
-                $sort_details = explode('_', $sort);
-                if (count($sort_details) == 2) {
-                    $sort_category = $sort_details[0];
-                    $sort_direction = strtoupper($sort_details[1]);
-                    switch ($sort_category) {
-                        case "component":
-                            usort($this->metrics, "sort_by_component");
-                            break;
-                        case "name":
-                            usort($this->metrics, "sort_by_name");
-                            break;
-                    }
-                    if ($sort_direction == "DESC") {
-                        print("reversing sort");
-                        $this->metrics = array_reverse($this->metrics);
-                    }
+        if (!empty($sort_array)) {
+            foreach ($sort_array as $sort) {
+                $sort_category = $sort[0];
+                $sort_direction = $sort[1];
+                switch ($sort_category) {
+                    case "component":
+                        usort($this->metrics, "sort_by_component");
+                        break;
+                    case "name":
+                        usort($this->metrics, "sort_by_name");
+                        break;
+                }
+                if ($sort_direction == sorting_helper::DESC) {
+                    $this->metrics = array_reverse($this->metrics);
                 }
             }
         }
@@ -135,49 +131,47 @@ final class overview implements renderable, templatable {
                 ];
             }
         }
-        $data['has_sort'] = !empty($sortings_raw);
-        foreach ($sortings_raw as $sort) {
-            $sort_details = explode('_', $sort);
-            if (count($sort_details) == 2) {
-                $sort_category = $sort_details[0];
-                $sort_direction = strtoupper($sort_details[1]);
-                $data['sort'][] = [
-                        'category' => $sort_category,
-                        'direction' => $sort_direction,
-                ];
-                switch ($sort_category) {
-                    case "component":
-                        switch ($sort_direction) {
-                            case "DESC":
-                                $data['sort_component_desc'] = true;
-                                break;
-                            case "ASC":
-                            default:
-                                $data['sort_component_asc'] = true;
-                                break;
-                        }
-                        break;
-                    case "name":
-                        switch ($sort_direction) {
-                            case "DESC":
-                                $data['sort_name_desc'] = true;
-                                break;
-                            case "ASC":
-                            default:
-                                $data['sort_name_asc'] = true;
-                                break;
-                        }
-                        break;
-                }
+        $data['has_sort'] = !empty($sort_array);
+    foreach ($sort_array as $sort) {
+            $sort_category = $sort[0];
+            $sort_direction = $sort[1];
+            $data['sort'][] = [
+                    'category' => $sort_category,
+                    'direction' => $sort_direction,
+            ];
+            switch ($sort_category) {
+                case "component":
+                    switch ($sort_direction) {
+                        case sorting_helper::DESC:
+                            $data['sort_component_desc'] = true;
+                            break;
+                        case sorting_helper::ASC:
+                        default:
+                            $data['sort_component_asc'] = true;
+                            break;
+                    }
+                    break;
+                case "name":
+                    switch ($sort_direction) {
+                        case sorting_helper::DESC:
+                            $data['sort_name_desc'] = true;
+                            break;
+                        case sorting_helper::ASC:
+                        default:
+                            $data['sort_name_asc'] = true;
+                            break;
+                    }
+                    break;
             }
         }
+
         $default_sorting_url = $this->currenturl;
         $default_sorting_url->remove_params('sort');
         $data['url_default_sorting'] = $default_sorting_url->out(escaped: false);
-        $data['url_sort_component_asc'] = $this->sort_url('component_asc')->out(escaped: false);
-        $data['url_sort_component_desc'] = $this->sort_url('component_desc')->out(escaped: false);
-        $data['url_sort_name_asc'] = $this->sort_url('name_asc')->out(escaped: false);
-        $data['url_sort_name_desc'] = $this->sort_url('name_desc')->out(escaped: false);
+        $sort_component_arr = sorting_helper::add_sort($sort_array, 'component');
+        $data['url_sort_component'] = $this->sort_url(sorting_helper::tostring($sort_component_arr))->out(escaped: false);
+        $sort_name_arr = sorting_helper::add_sort($sort_array, 'name');
+        $data['url_sort_name'] = $this->sort_url(sorting_helper::tostring($sort_name_arr))->out(escaped: false);
         return $data;
     }
 
@@ -229,23 +223,9 @@ final class overview implements renderable, templatable {
         return new moodle_url('/admin/tool/monitoring/', $params);
     }
 
-    private function sort_url(string $newsort): moodle_url {
+    private function sort_url(string $sortstring): moodle_url {
         $newurl = $this->currenturl;
-        print($newurl . "<br>");
-
-        $currentsortparam = $newurl->get_param('sort') ?? '';
-        print($currentsortparam . "<br>");
-        $sorts = $currentsortparam === '' ? [] : explode(',', $currentsortparam);
-        var_dump($sorts);
-
-        $newcategory = explode('_', $newsort)[0];
-        print("<br>" . $newcategory);
-        $sorts = array_filter($sorts, function($entry) use ($newcategory) {
-            return explode('_', $entry)[0] !== $newcategory;
-        });
-
-        $sorts[] = $newsort;
-        $newurl->param('sort', implode(',', $sorts));
+        $newurl->param('sort', $sortstring);
         return $newurl;
     }
 }
