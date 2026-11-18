@@ -68,13 +68,13 @@ final class overview implements renderable, templatable {
     public function export_for_template(renderer_base $output): array {
         $tagsenabled = managed_metric_tag::is_enabled();
         $lines = [];
-        $sort_array = sorting_helper::parse_sort_string($this->sort);
+        $sortarray = sorting_helper::parse_sort_string($this->sort);
 
-        if (!empty($sort_array)) {
-            foreach ($sort_array as $sort) {
-                $sort_category = $sort[0];
-                $sort_direction = $sort[1];
-                switch ($sort_category) {
+        if (!empty($sortarray)) {
+            foreach ($sortarray as $sort) {
+                $sortcategory = $sort[0];
+                $sortdirection = $sort[1];
+                switch ($sortcategory) {
                     case "component":
                         usort($this->metrics, "sort_by_component");
                         break;
@@ -82,7 +82,7 @@ final class overview implements renderable, templatable {
                         usort($this->metrics, "sort_by_name");
                         break;
                 }
-                if ($sort_direction == sorting_helper::DESC) {
+                if ($sortdirection == sorting_helper::DESC) {
                     $this->metrics = array_reverse($this->metrics);
                 }
             }
@@ -131,17 +131,17 @@ final class overview implements renderable, templatable {
                 ];
             }
         }
-        $data['has_sort'] = !empty($sort_array);
-    foreach ($sort_array as $sort) {
-            $sort_category = $sort[0];
-            $sort_direction = $sort[1];
+        $data['has_sort'] = !empty($sortarray);
+        foreach ($sortarray as $sort) {
+            $sortcategory = $sort[0];
+            $sortdirection = $sort[1];
             $data['sort'][] = [
-                    'category' => $sort_category,
-                    'direction' => $sort_direction,
+                    'category' => $sortcategory,
+                    'direction' => $sortdirection,
             ];
-            switch ($sort_category) {
+            switch ($sortcategory) {
                 case "component":
-                    switch ($sort_direction) {
+                    switch ($sortdirection) {
                         case sorting_helper::DESC:
                             $data['sort_component_desc'] = true;
                             break;
@@ -152,7 +152,7 @@ final class overview implements renderable, templatable {
                     }
                     break;
                 case "name":
-                    switch ($sort_direction) {
+                    switch ($sortdirection) {
                         case sorting_helper::DESC:
                             $data['sort_name_desc'] = true;
                             break;
@@ -165,13 +165,13 @@ final class overview implements renderable, templatable {
             }
         }
 
-        $default_sorting_url = $this->currenturl;
-        $default_sorting_url->remove_params('sort');
-        $data['url_default_sorting'] = $default_sorting_url->out(escaped: false);
-        $sort_component_arr = sorting_helper::add_sort($sort_array, 'component');
-        $data['url_sort_component'] = $this->sort_url(sorting_helper::tostring($sort_component_arr))->out(escaped: false);
-        $sort_name_arr = sorting_helper::add_sort($sort_array, 'name');
-        $data['url_sort_name'] = $this->sort_url(sorting_helper::tostring($sort_name_arr))->out(escaped: false);
+        $defaultsortingurl = $this->currenturl;
+        $defaultsortingurl->remove_params('sort');
+        $data['url_default_sorting'] = $defaultsortingurl->out(escaped: false);
+        $sortcomponentarr = sorting_helper::add_sort($sortarray, 'component');
+        $data['url_sort_component'] = $this->sort_url(sorting_helper::tostring($sortcomponentarr))->out(escaped: false);
+        $sortnamearr = sorting_helper::add_sort($sortarray, 'name');
+        $data['url_sort_name'] = $this->sort_url(sorting_helper::tostring($sortnamearr))->out(escaped: false);
         return $data;
     }
 
@@ -185,7 +185,6 @@ final class overview implements renderable, templatable {
         $tags = $this->tags;
         if (empty($tags)) {
             return new moodle_url('/admin/tool/monitoring/');
-
         } else {
             return new moodle_url('/admin/tool/monitoring/', ['tag' => implode(',', array_keys($tags))]);
         }
@@ -223,9 +222,15 @@ final class overview implements renderable, templatable {
         return new moodle_url($this->currenturl, ['tag' => $tagparam]);
     }
 
-    private function sort_url(string $sortstring): moodle_url {
+    /**
+     * Generates a URL to the current overview with a new sorting by the given property.
+     *
+     * @param string $sortproperty Property to sort by.
+     * @return moodle_url URL with current the `tag` query parameter and the modified `sort` parameter.
+     */
+    private function sort_url(string $sortproperty): moodle_url {
         $newurl = $this->currenturl;
-        $newurl->param('sort', $sortstring);
+        $newurl->param('sort', $sortproperty);
         return $newurl;
     }
 }

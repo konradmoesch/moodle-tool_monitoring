@@ -28,33 +28,47 @@ namespace tool_monitoring\output;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class sorting_helper {
-
+    /**
+     * constant for the 'ascending' string
+     */
     const ASC = 'asc';
+    /**
+     * constant for the 'descending' string
+     */
     const DESC = 'desc';
 
-    /*
-    * parses a sort string (e.g. 'component_desc,name_asc') to a multidimensional array (first element: the detail to sort by, second element: sorting direction)
-    * @param string the sort string to parse
-    * @return array deserialized sorting details
-    */
-    public static function parse_sort_string($str): array {
-        if (empty($str)) {
+    /**
+     * parses a sort string (e.g. 'component_desc,name_asc') to a multidimensional array
+     * (first element: the property to sort by, second element: sorting direction)
+     * @param string $sortstring the sort string to parse
+     * @return array deserialized sorting details
+     */
+    public static function parse_sort_string(string $sortstring): array {
+        if (empty($sortstring)) {
             return [];
         }
-        return array_map(fn($s) => explode('_', $s), explode(',', $str));
+        return array_map(fn($s) => explode('_', $s), explode(',', $sortstring));
     }
 
-    /*
-    * serializes a sort array to a sort string (e.g. 'component_desc,name_asc')
-    * @param array the sort array to serialize
-    * @return string serialized sort string
-    */
-    public static function tostring($arr): string {
+    /**
+     * serializes a sort array to a sort string (e.g. 'component_desc,name_asc')
+     *
+     * @param array $arr the sort array to serialize
+     * @return string serialized sort string
+     */
+    public static function tostring(array $arr): string {
         return implode(',', array_map(fn($a) => implode('_', $a), $arr));
     }
 
-    private static function find_index($arr, $key): false|int {
-        foreach($arr as $i => $v) {
+    /**
+     * finds the index of a given string in the array
+     *
+     * @param array $arr the sort array to search
+     * @param string $key the string to search for
+     * @return int|false index of the array element or false if not found
+     */
+    private static function find_index(array $arr, string $key): false|int {
+        foreach ($arr as $i => $v) {
             if ($v[0] === $key) {
                 return $i;
             }
@@ -62,15 +76,17 @@ final class sorting_helper {
         return false;
     }
 
-    /*
-    * adds a sorting (e.g. 'name') to a sort array (first element: the detail to sort by, second element: sorting direction)
-    * if the sorting to add already exists, the direction gets inverted. if it does not exist yet, it gets added to the array.
-    * The sorting to add is always added to the beginning of the array (primary sorting)
-    * @param array $arr the sort array to add the sorting to
-    * @param string $key the detail to sort by
-    * @return array modified sort array
-    */
-    public static function add_sort($arr, $key) {
+    /**
+     * adds a sorting property (e.g. 'name') to a sort array
+     * (first element: the property to sort by, second element: sorting direction)
+     * if the property to add already exists, the direction gets inverted. if it does not exist yet, it gets added to the array.
+     * The property to add is always added to the beginning of the array (primary sorting)
+     *
+     * @param array $arr the sort array to add the sorting to
+     * @param string $key the property to sort by
+     * @return array modified sort array
+     */
+    public static function add_sort(array $arr, string $key) {
         $i = self::find_index($arr, $key);
         if ($i === 0) {
             if ($arr[0][1] === self::ASC) {

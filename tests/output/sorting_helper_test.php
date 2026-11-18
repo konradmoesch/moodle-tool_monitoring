@@ -58,33 +58,27 @@ final class sorting_helper_test extends advanced_testcase {
     public function test_parse_sort_string(): void {
         $sort = 'component_desc,name_asc';
         $arr = sorting_helper::parse_sort_string($sort);
-        $arr_expected = array(
-            0 => array("component", "desc"),
-            1 => array("name", "asc"),
-        );
-        self::assertEquals($arr_expected, $arr);
+        $arrexpected = [["component", "desc"], ["name", "asc"]];
+        self::assertEquals($arrexpected, $arr);
 
-        $sort_empty = '';
-        $arr_empty = sorting_helper::parse_sort_string($sort_empty);
-        self::assertEquals([], $arr_empty);
+        $sortempty = '';
+        $arrempty = sorting_helper::parse_sort_string($sortempty);
+        self::assertEquals([], $arrempty);
     }
 
     /**
      * Tests the {@see sorting_helper::tostring} method.
      */
     public function test_tostring(): void {
-        $arr = array(
-                0 => array("component", "desc"),
-                1 => array("name", "asc"),
-        );
+        $arr = [["component", "desc"], ["name", "asc"]];
         $sort = sorting_helper::tostring($arr);
-        $sort_expected = 'component_desc,name_asc';
-        self::assertEquals($sort_expected, $sort);
+        $sortexpected = 'component_desc,name_asc';
+        self::assertEquals($sortexpected, $sort);
 
-        $arr_empty = [];
-        $sort_empty = sorting_helper::tostring($arr_empty);
-        $sort_empty_expected = '';
-        self::assertEquals($sort_empty_expected, $sort_empty);
+        $arrempty = [];
+        $sortempty = sorting_helper::tostring($arrempty);
+        $sortemptyexpected = '';
+        self::assertEquals($sortemptyexpected, $sortempty);
     }
 
     /**
@@ -93,8 +87,8 @@ final class sorting_helper_test extends advanced_testcase {
     public function test_roundtrip(): void {
         $sort = 'component_desc,name_asc';
         $arr = sorting_helper::parse_sort_string($sort);
-        $sort_new = sorting_helper::tostring($arr);
-        self::assertEquals($sort_new, $sort);
+        $sortnew = sorting_helper::tostring($arr);
+        self::assertEquals($sortnew, $sort);
     }
 
     /**
@@ -102,42 +96,42 @@ final class sorting_helper_test extends advanced_testcase {
      */
     public function test_add_sort(): void {
         $sort = 'name_desc,component_asc';
-        $to_add = 'name';
+        $toadd = 'name';
         $expected = 'name_asc,component_asc';
         $arr = sorting_helper::parse_sort_string($sort);
-        $arr = sorting_helper::add_sort($arr, $to_add);
+        $arr = sorting_helper::add_sort($arr, $toadd);
         $sort = sorting_helper::tostring($arr);
         self::assertEquals($expected, $sort);
 
         $sort = 'name_desc,component_asc';
-        $to_add = 'component';
+        $toadd = 'component';
         $expected = 'component_asc,name_desc';
         $arr = sorting_helper::parse_sort_string($sort);
-        $arr = sorting_helper::add_sort($arr, $to_add);
+        $arr = sorting_helper::add_sort($arr, $toadd);
         $sort = sorting_helper::tostring($arr);
         self::assertEquals($expected, $sort);
 
         $sort = 'name_desc,component_asc';
-        $to_add = 'name';
+        $toadd = 'name';
         $expected = 'name_asc,component_asc';
         $arr = sorting_helper::parse_sort_string($sort);
-        $arr = sorting_helper::add_sort($arr, $to_add);
+        $arr = sorting_helper::add_sort($arr, $toadd);
         $sort = sorting_helper::tostring($arr);
         self::assertEquals($expected, $sort);
 
         $sort = 'name_desc,component_desc';
-        $to_add = 'component';
+        $toadd = 'component';
         $expected = 'component_asc,name_desc';
         $arr = sorting_helper::parse_sort_string($sort);
-        $arr = sorting_helper::add_sort($arr, $to_add);
+        $arr = sorting_helper::add_sort($arr, $toadd);
         $sort = sorting_helper::tostring($arr);
         self::assertEquals($expected, $sort);
 
         $sort = '';
-        $to_add = 'component';
+        $toadd = 'component';
         $expected = 'component_asc';
         $arr = sorting_helper::parse_sort_string($sort);
-        $arr = sorting_helper::add_sort($arr, $to_add);
+        $arr = sorting_helper::add_sort($arr, $toadd);
         $sort = sorting_helper::tostring($arr);
         self::assertEquals($expected, $sort);
     }

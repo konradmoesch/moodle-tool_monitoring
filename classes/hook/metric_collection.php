@@ -46,7 +46,8 @@ use Traversable;
 final class metric_collection implements described_hook, IteratorAggregate {
     /** @var array<string, array<string, metric>> All added metrics indexed first by component, then by name. */
     private array $metrics = [];
-    private array $metrics_unordered = [];
+    /** @var array<metric>> All added metrics indexed by the order of arrival. */
+    private array $metricsunordered = [];
 
     /**
      * Adds the specified metric to the collection.
@@ -61,7 +62,7 @@ final class metric_collection implements described_hook, IteratorAggregate {
             $this->metrics[$component] = [];
         }
         $this->metrics[$component][$metric->get_name()] = $metric;
-        $this->metrics_unordered[sizeof($this->metrics_unordered)] = $metric;
+        $this->metricsunordered[count($this->metricsunordered)] = $metric;
     }
 
     /**
@@ -110,8 +111,8 @@ final class metric_collection implements described_hook, IteratorAggregate {
      */
     #[\Override]
     public function getIterator(): Traversable {
-        foreach ($this->metrics_unordered as $metric) {
-                yield $metric;
-            }
+        foreach ($this->metricsunordered as $metric) {
+            yield $metric;
+        }
     }
 }

@@ -44,13 +44,31 @@ require_login();
 
 require_capability('tool/monitoring:manage_metrics', context_system::instance());
 
+/**
+ * sorts two metrics alphabetically by their components
+ *
+ * @param managed_metric $metric1 the first metric to sort
+ * @param managed_metric $metric2 the second metric to sort
+ * @return int the order of the metrics (positive, negative or equal)
+ */
 function sort_by_component(managed_metric $metric1, managed_metric $metric2): int {
-    if ($metric1->component == $metric2->component) return 0;
+    if ($metric1->component == $metric2->component) {
+        return 0;
+    }
     return ($metric1->component < $metric2->component) ? -1 : 1;
 }
 
+/**
+ * sorts two metrics alphabetically by their names
+ *
+ * @param managed_metric $metric1 the first metric to sort
+ * @param managed_metric $metric2 the second metric to sort
+ * @return int the order of the metrics (positive, negative or equal)
+ */
 function sort_by_name(managed_metric $metric1, managed_metric $metric2): int {
-    if ($metric1->name == $metric2->name) return 0;
+    if ($metric1->name == $metric2->name) {
+        return 0;
+    }
     return ($metric1->name < $metric2->name) ? -1 : 1;
 }
 
@@ -71,12 +89,12 @@ $PAGE->set_secondary_active_tab('modules');
 $PAGE->set_url('/admin/tool/monitoring/', $params);
 
 $manager = di::get(metrics_manager::class)->sync(delete: true);
-$filtered_metrics = $manager->filter(tagnames: $tagnames);
+$filteredmetrics = $manager->filter(tagnames: $tagnames);
 
 $currenturl = $PAGE->url;
 
 $overview = new overview(
-    metrics: $filtered_metrics,
+    metrics: $filteredmetrics,
     tags: managed_metric_tag::get_all_with_names(...$tagnames),
     sort: $sortlist,
     currenturl: $currenturl,
