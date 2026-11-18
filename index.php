@@ -57,7 +57,6 @@ function sort_by_name(managed_metric $metric1, managed_metric $metric2): int {
 // Handle tags parameter for filtering of multiple tags.
 $taglist = optional_param('tag', '', PARAM_TAGLIST);
 $sortlist = optional_param('sort', '', PARAM_TEXT);
-print("sortlist: " . $sortlist);
 $params = [];
 if ($taglist) {
     $tagnames = explode(',', $taglist);
@@ -66,7 +65,6 @@ if ($taglist) {
     $tagnames = [];
 }
 $params['sort'] = $sortlist;
-var_dump($params);
 
 admin_externalpage_setup('tool_monitoring_overview');
 $PAGE->set_secondary_active_tab('modules');
@@ -76,8 +74,6 @@ $manager = di::get(metrics_manager::class)->sync(delete: true);
 $filtered_metrics = $manager->filter(tagnames: $tagnames);
 
 $currenturl = $PAGE->url;
-
-print($currenturl->out(false));
 
 $overview = new overview(
     metrics: $filtered_metrics,
